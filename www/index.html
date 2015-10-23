@@ -1,14 +1,131 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8">
-  <title>Titre de la page</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js"></script>
-</head>
-<body>
-  ...
-  <!-- Le reste du contenu -->
-  ...
-</body>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript">
+    var map;
+
+
+    var lats = [{lat: 37.769, lng: -122.446},{lat: 37.769, lng: -122.446},{lat: 37.769, lng: -122.446},{lat: 36.769, lng: -120.446},{lat: 38.769, lng: -124.446}];
+
+    document.addEventListener("deviceready", function() {
+
+      // Wait until the map is ready status.
+      map.addEventListener(plugin.google.maps.event.MAP_READY, onMapReady);
+
+
+      map = new google.maps.Map(document.getElementById('map_canvas'), {
+        zoom: 12,
+        center: lats[3],
+        mapTypeId: google.maps.MapTypeId.TERRAIN
+      });
+
+      // This event listener will call addMarker() when the map is clicked.
+      map.addListener('click', function(event) {
+        addMarker(event.latLng);
+      });
+
+    
+
+    }, false);
+
+    function onMapReady() {
+      var button = document.getElementById("button");
+      button.addEventListener("click", onBtnClicked, false);
+      //map.getMyLocation(onLocationSuccess,onLocationError);
+
+
+        map.addMarker({
+        'position': lats[0],
+        'title':"hi",
+        'snippet':'tap here',
+        'style':{
+          'text-align':'center',
+          'font-style':'italic',
+          'font-weight':'bold',
+          'color':'red'
+        },
+        animation:plugin.google.maps.Animation.DROP
+      }, onMarkerAdded);
+    }
+
+
+
+    function onLocationSuccess(result){
+
+        alert(JSON.stringify(result,null,4));
+
+        var lats = [{lat: 37.769, lng: -122.446},{lat: 37.769, lng: -122.446}];
+
+        map.addMarker({
+        'position': result.latLng,
+        'title':"hi",
+        'snippet':'tap here',
+        'style':{
+          'text-align':'center',
+          'font-style':'italic',
+          'font-weight':'bold',
+          'color':'red'
+        },
+        animation:plugin.google.maps.Animation.DROP
+      }, onMarkerAdded);
+    }
+
+    function onMarkerAdded(marker){
+      marker.showInfoWindow();
+      marker.addEventListener(plugin.google.maps.event.INFO_CLICK, onInfoWndClicked);
+    }
+
+    function onLocationError(error_obj){
+      alert("cannot detect location");
+    }
+
+    function onBtnClicked() {
+      map.showDialog();
+    }
+
+    var markers = [];
+
+
+    // Adds a marker to the map and push to the array.
+    function addMarker(location) {
+      var marker = new google.maps.Marker({
+        position: location,
+        map: map
+      });
+      markers.push(marker);
+    }
+
+    // Sets the map on all markers in the array.
+    function setMapOnAll(map) {
+      for (var i = 0; i < markers.length; i++) {
+        markers[i].setMap(map);
+      }
+    }
+
+    // Removes the markers from the map, but keeps them in the array.
+    function clearMarkers() {
+      setMapOnAll(null);
+    }
+
+    // Shows any markers currently in the array.
+    function showMarkers() {
+      setMapOnAll(map);
+    }
+
+    // Deletes all markers in the array by removing references to them.
+    function deleteMarkers() {
+      clearMarkers();
+      markers = [];
+    }
+
+    </script>
+  </head>
+  <body>
+    <h3>PhoneGap-GoogleMaps-Plugin</h3>
+    <div style="width:100%;height:400px" id="map_canvas"></div>
+    <button id="button">Full Screen</button>
+  </body>
 </html>
